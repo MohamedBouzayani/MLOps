@@ -13,5 +13,12 @@ model.train(data=data_yaml, epochs=10, imgsz=640)
 
 # Save best model to outputs (after training, it's saved in runs/train/exp*/weights)
 import shutil, glob
-best_pt = glob.glob('/opt/hostedtoolcache/Python/3.9.25/x64/lib/python3.9/site-packages/tests/tmp/runs/detect/train')[0]
+#best_pt = glob.glob('/opt/hostedtoolcache/Python/3.9.25/x64/lib/python3.9/site-packages/tests/tmp/runs/detect/train')[0]
+#shutil.copy(best_pt, os.path.join(output_dir, 'model_a_best.pt'))
+
+# Find and copy best model
+best_pt = glob.glob('runs/detect/train*/weights/best.pt')[-1]  # take latest
+os.makedirs(output_dir, exist_ok=True)
 shutil.copy(best_pt, os.path.join(output_dir, 'model_a_best.pt'))
+
+print('Training done. Best model saved.')
