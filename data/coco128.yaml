@@ -1,5 +1,5 @@
-train: data/images/train2017
-val: data/images/train2017
+train: /home/runner/work/MLOps/MLOps/data/images/train2017
+val: /home/runner/work/MLOps/MLOps/data/images/train2017
 nc: 80
 names:
   [
