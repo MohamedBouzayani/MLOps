@@ -16,7 +16,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
+      - name: List files for debug
+        run: ls -lR
       - name: Install dependencies
         run: pip install ultralytics
 
