@@ -20,8 +20,8 @@ jobs:
         run: ls -lR
       - name: List files under /home/runner/work
         run: ls -lR /home/runner/work
-      - name: Install dependencies
-        run: pip install ultralytics
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
 
       - name: Train YOLO Model
         run: python models/yolo26n/train.py

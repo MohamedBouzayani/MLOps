@@ -5,7 +5,7 @@ import os
 print("Current working dir:", os.getcwd())
 print("Content in cwd:", os.listdir())
 print("Does coco128.yaml exist?", os.path.exists('coco128.yaml'))
-data_yaml = os.path.abspath('../../coco128/coco128.yaml')
+data_yaml = os.path.abspath('/home/runner/work/MLOps/MLOps/models/yolo26n/coco128.yaml')
 output_dir = os.path.abspath('../../outputs/model_weights/')
 
 model = YOLO("yolov8n.pt")
