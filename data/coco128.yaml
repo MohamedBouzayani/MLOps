@@ -1,5 +1,5 @@
-train: coco128/images/train2017
-val: coco128/images/train2017
+train: data/images/train2017
+val: data/images/train2017
 nc: 80
 names:
   [
