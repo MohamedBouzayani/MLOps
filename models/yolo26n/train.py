@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import os
 
-data_yaml = os.path.abspath('../../data/my_custom_dataset.yaml')
+data_yaml = os.path.abspath('../../data/coco182.yaml.yaml')
 output_dir = os.path.abspath('../../outputs/model_weights/')
 
 model = YOLO("yolov8n.pt")

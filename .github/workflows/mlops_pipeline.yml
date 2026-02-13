@@ -21,7 +21,7 @@ jobs:
         run: pip install ultralytics
 
       - name: Train YOLO Model
-        run: python models/yolo_a/train.py
+        run: python models/yolo26n/train.py
 
       - name: Evaluate YOLO Model
         run: python scripts/evaluate.py
