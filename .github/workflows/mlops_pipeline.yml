@@ -18,6 +18,8 @@ jobs:
           python-version: '3.9'
       - name: List files for debug
         run: ls -lR
+      - name: List files under /home/runner/work
+        run: ls -lR /home/runner/work
       - name: Install dependencies
         run: pip install ultralytics
 
