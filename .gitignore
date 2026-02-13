@@ -1,6 +1,6 @@
 # .gitignore
-data/images/
-data/labels/
+#data/images/
+#data/labels/
 outputs/model_weights/
 *.pt
 __pycache__/
