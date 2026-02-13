@@ -1,0 +1,27 @@
+name: Local MLOps Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  setup-and-train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install ultralytics
+
+      - name: Train YOLO Model
+        run: python models/yolo_a/train.py
+
+      - name: Evaluate YOLO Model
+        run: python scripts/evaluate.py
