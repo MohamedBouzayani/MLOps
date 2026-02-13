@@ -18,6 +18,7 @@ import shutil, glob
 
 # Find and copy best model
 best_pt = '/opt/hostedtoolcache/Python/3.9.25/x64/lib/python3.9/site-packages/tests/tmp/runs/detect/train/weights/best.pt'
+os.makedirs(output_dir, exist_ok=True)
 shutil.copy(best_pt, os.path.join(output_dir, 'model_a_best.pt'))
 
 print('Training done. Best model saved.')
