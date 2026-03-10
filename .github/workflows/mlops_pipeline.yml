@@ -24,7 +24,7 @@ jobs:
         run: python models/yolo26n/train.py
 
       - name: Upload trained model as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   # <<<<<< FIXED VERSION
         with:
           name: yolo-best-model
           path: outputs/model_weights/model_a_best.pt
@@ -45,7 +45,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Download trained model artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4   # <<<<<< FIXED VERSION
         with:
           name: yolo-best-model
           path: outputs/model_weights/
