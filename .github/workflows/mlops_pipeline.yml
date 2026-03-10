@@ -1,4 +1,4 @@
-name: Local MLOps Pipeline
+name: MLOps pipeline with training and evaluation
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-and-train:
+  train:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -16,15 +16,39 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: List files for debug
-        run: ls -lR
-      - name: List files under /home/runner/work
-        run: ls -lR /home/runner/work
+
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
       - name: Train YOLO Model
         run: python models/yolo26n/train.py
+
+      - name: Upload trained model as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: yolo-best-model
+          path: outputs/model_weights/model_a_best.pt
+
+  evaluate:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download trained model artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: yolo-best-model
+          path: outputs/model_weights/
 
       - name: Evaluate YOLO Model
         run: python scripts/evaluate.py
