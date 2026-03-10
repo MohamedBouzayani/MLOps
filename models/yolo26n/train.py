@@ -1,24 +1,37 @@
 from ultralytics import YOLO
 import os
+import shutil
 
-import os
+# Debug info
 print("Current working dir:", os.getcwd())
 print("Content in cwd:", os.listdir())
-print("Does coco128.yaml exist?", os.path.exists('coco128.yaml'))
-data_yaml = os.path.abspath('/home/runner/work/MLOps/MLOps/data/coco128.yaml')
-output_dir = os.path.abspath('../../outputs/model_weights/')
 
+# Data yaml
+data_yaml = '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
+output_dir = '/home/runner/work/MLOps/MLOps/outputs/model_weights'  # absolute desired output directory
+
+# Train YOLO model
 model = YOLO("yolov8n.pt")
-model.train(data=data_yaml, epochs=10, imgsz=640)
+results = model.train(data=data_yaml, epochs=10, imgsz=640)
 
-# Save best model to outputs (after training, it's saved in runs/train/exp*/weights)
-import shutil, glob
-#best_pt = glob.glob('/opt/hostedtoolcache/Python/3.9.25/x64/lib/python3.9/site-packages/tests/tmp/runs/detect/train')[0]
-#shutil.copy(best_pt, os.path.join(output_dir, 'model_a_best.pt'))
+# Get the actual YOLO output directory (works for YOLOv8+)
+yolo_saved_dir = results.save_dir  # e.g. '/opt/hostedtoolcache/.../runs/detect/train'
+print("YOLO outputs saved to:", yolo_saved_dir)
 
-# Find and copy best model
-best_pt = '/opt/hostedtoolcache/Python/3.9.25/x64/lib/python3.9/site-packages/tests/tmp/runs/detect/train/weights/best.pt'
+# Path to best.pt file
+best_pt = os.path.join(yolo_saved_dir, "weights", "best.pt")
+print("best.pt file location:", best_pt)
+
+# Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)
-shutil.copy(best_pt, os.path.join(output_dir, 'model_a_best.pt'))
+
+# Copy best model to output_dir/model_a_best.pt
+dst_path = os.path.join(output_dir, "model_a_best.pt")
+if os.path.isfile(best_pt):
+    shutil.copy(best_pt, dst_path)
+    print(f"Best model copied to: {dst_path}")
+else:
+    print(f"best.pt not found at: {best_pt}")
+    exit(1)  # Fail if not found
 
 print('Training done. Best model saved.')
