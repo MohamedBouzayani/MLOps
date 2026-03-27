@@ -7,15 +7,19 @@ print("Current working dir:", os.getcwd())
 print("Content in cwd:", os.listdir())
 
 # Data yaml
-data_yaml = '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
-output_dir = '/home/runner/work/MLOps/MLOps/outputs/model_weights'  # absolute desired output directory
+data_yaml = (
+    '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
+)
+output_dir = (
+    '/home/runner/work/MLOps/MLOps/outputs/model_weights'  # absolute desired output directory
+)
 
 # Train YOLO model
 model = YOLO("yolov8n.pt")
 results = model.train(data=data_yaml, epochs=10, imgsz=640)
 
 # Get the actual YOLO output directory (works for YOLOv8+)
-yolo_saved_dir = results.save_dir  # e.g. '/opt/hostedtoolcache/.../runs/detect/train'
+yolo_saved_dir = results.save_dir 
 print("YOLO outputs saved to:", yolo_saved_dir)
 
 # Path to best.pt file
