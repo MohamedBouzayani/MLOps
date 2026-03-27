@@ -11,8 +11,8 @@ data_yaml = (
     '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
 )
 output_dir = (
-    '/home/runner/work/MLOps/MLOps/outputs/model_weights'  
-) # absolute desired output directory
+    '/home/runner/work/MLOps/MLOps/outputs/model_weights'
+)  # absolute desired output directory
 
 # Train YOLO model
 model = YOLO("yolov8n.pt")
