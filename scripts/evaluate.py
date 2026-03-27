@@ -6,8 +6,8 @@ model_path = (
 )
 if not os.path.exists(model_path):
     raise FileNotFoundError(
-    f"{model_path} not found! Did training and copy step complete successfully?"
-)
+        f"{model_path} not found! Did training and copy step complete successfully?"
+    )
 
 model = YOLO(model_path)
 metrics = model.val(
