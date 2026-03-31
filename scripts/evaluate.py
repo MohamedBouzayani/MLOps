@@ -1,5 +1,7 @@
 import os
+import json
 from ultralytics import YOLO
+import mlflow
 
 model_path = (
     '/home/runner/work/MLOps/MLOps/outputs/model_weights/model_a_best.pt'
@@ -9,10 +11,37 @@ if not os.path.exists(model_path):
         f"{model_path} not found! Did training and copy step complete success?"
     )
 
-model = YOLO(model_path)
-metrics = model.val(
-    data=os.path.abspath(
+# Start MLflow run
+with mlflow.start_run(run_name="YOLO_Evaluation"):
+    model = YOLO(model_path)
+    data_yaml = os.path.abspath(
         '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
     )
-)
-print(metrics)
+    metrics = model.val(data=data_yaml)
+    print(metrics)
+
+    # If metrics is a dict-like object, save it to a JSON file and log metrics
+    metrics_dict = None
+    metrics_path = "outputs/metrics.json"
+    # Try to get a metrics dictionary if available (YOLOv8 returns a special object)
+    if hasattr(metrics, "keys"):
+        metrics_dict = dict(metrics)
+    elif hasattr(metrics, "results_dict"):
+        metrics_dict = metrics.results_dict
+    elif hasattr(metrics, "metrics"):
+        metrics_dict = metrics.metrics
+
+    if metrics_dict:
+        os.makedirs("outputs", exist_ok=True)
+        with open(metrics_path, "w") as f:
+            json.dump(metrics_dict, f, indent=2)
+        # Log all key metrics to MLflow
+        for k, v in metrics_dict.items():
+            try:
+                mlflow.log_metric(k, float(v))
+            except Exception:
+                pass
+        # Log the metrics file itself
+        mlflow.log_artifact(metrics_path, artifact_path="eval")
+    else:
+        print("Could not extract metrics for MLflow logging.")

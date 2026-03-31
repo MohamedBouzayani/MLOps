@@ -1,41 +1,57 @@
 from ultralytics import YOLO
 import os
 import shutil
+import mlflow
 
-# Debug info
-print("Current working dir:", os.getcwd())
-print("Content in cwd:", os.listdir())
+# Start MLflow run
+with mlflow.start_run(run_name="YOLO_Training"):
+    # Debug info
+    print("Current working dir:", os.getcwd())
+    print("Content in cwd:", os.listdir())
 
-# Data yaml
-data_yaml = (
-    '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
-)
-output_dir = (
-    '/home/runner/work/MLOps/MLOps/outputs/model_weights'
-)  # absolute desired output directory
+    # Data yaml
+    data_yaml = (
+        '/home/runner/work/MLOps/MLOps/data/coco128.yaml'  # absolute path to yaml
+    )
+    output_dir = (
+        '/home/runner/work/MLOps/MLOps/outputs/model_weights'
+    )  # absolute desired output directory
 
-# Train YOLO model
-model = YOLO("yolov8n.pt")
-results = model.train(data=data_yaml, epochs=10, imgsz=640)
+    # Log hyperparameters to MLflow
+    mlflow.log_param("yolo_model", "yolov8n.pt")
+    mlflow.log_param("epochs", 10)
+    mlflow.log_param("imgsz", 640)
+    mlflow.log_param("data_yaml", data_yaml)
 
-# Get the actual YOLO output directory (works for YOLOv8+)
-yolo_saved_dir = results.save_dir
-print("YOLO outputs saved to:", yolo_saved_dir)
+    # Train YOLO model
+    model = YOLO("yolov8n.pt")
+    results = model.train(data=data_yaml, epochs=10, imgsz=640)
 
-# Path to best.pt file
-best_pt = os.path.join(yolo_saved_dir, "weights", "best.pt")
-print("best.pt file location:", best_pt)
+    # Get the actual YOLO output directory (works for YOLOv8+)
+    yolo_saved_dir = results.save_dir
+    print("YOLO outputs saved to:", yolo_saved_dir)
 
-# Ensure output directory exists
-os.makedirs(output_dir, exist_ok=True)
+    # Path to best.pt file
+    best_pt = os.path.join(yolo_saved_dir, "weights", "best.pt")
+    print("best.pt file location:", best_pt)
 
-# Copy best model to output_dir/model_a_best.pt
-dst_path = os.path.join(output_dir, "model_a_best.pt")
-if os.path.isfile(best_pt):
-    shutil.copy(best_pt, dst_path)
-    print(f"Best model copied to: {dst_path}")
-else:
-    print(f"best.pt not found at: {best_pt}")
-    exit(1)  # Fail if not found
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
 
-print('Training done. Best model saved.')
+    # Copy best model to output_dir/model_a_best.pt
+    dst_path = os.path.join(output_dir, "model_a_best.pt")
+    if os.path.isfile(best_pt):
+        shutil.copy(best_pt, dst_path)
+        print(f"Best model copied to: {dst_path}")
+        # Log model artifact in MLflow
+        mlflow.log_artifact(dst_path, artifact_path="model")
+    else:
+        print(f"best.pt not found at: {best_pt}")
+        exit(1)  # Fail if not found
+
+    # Log training metrics if available
+    # If using YOLOv8, you can get metrics like this:
+    if hasattr(results, "metrics"):
+        for m, val in results.metrics.items():
+            mlflow.log_metric(m, val)
+    print('Training done. Best model saved and logged to MLflow.')
