@@ -20,7 +20,6 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
     metrics = model.val(data=data_yaml)
     print(metrics)
 
-    # If metrics is a dict-like object, save it to a JSON file and log metrics
     metrics_dict = None
     metrics_path = "outputs/metrics.json"
     # Try to get a metrics dictionary if available (YOLOv8 returns a special object)
@@ -35,13 +34,11 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
         os.makedirs("outputs", exist_ok=True)
         with open(metrics_path, "w") as f:
             json.dump(metrics_dict, f, indent=2)
-        # Log all key metrics to MLflow
         for k, v in metrics_dict.items():
             try:
                 mlflow.log_metric(k, float(v))
             except Exception:
                 pass
-        # Log the metrics file itself
         mlflow.log_artifact(metrics_path, artifact_path="eval")
     else:
         print("Could not extract metrics for MLflow logging.")
