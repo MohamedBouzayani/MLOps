@@ -22,7 +22,7 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
 
     metrics_dict = None
     metrics_path = "outputs/metrics.json"
-    # Try to get a metrics dictionary if available (YOLOv8 returns a special object)
+    # Try to get a metrics dictionary if available
     if hasattr(metrics, "keys"):
         metrics_dict = dict(metrics)
     elif hasattr(metrics, "results_dict"):
