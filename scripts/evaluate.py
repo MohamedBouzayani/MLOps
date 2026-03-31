@@ -45,4 +45,4 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
                 continue
         mlflow.log_artifact(metrics_path, artifact_path="eval")
     else:
-        print("Could not extract metrics for MLflow logging.")
+        print("Could not extract metrics for MLflow log.")
