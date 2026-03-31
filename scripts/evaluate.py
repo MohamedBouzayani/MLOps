@@ -11,24 +11,28 @@ if not os.path.exists(model_path):
         f"{model_path} not found! Did training and copy step complete success?"
     )
 
-# Start MLflow run
 with mlflow.start_run(run_name="YOLO_Evaluation"):
     model = YOLO(model_path)
     data_yaml = os.path.abspath(
         '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
     )
-    metrics = model.val(data=data_yaml)
-    print(metrics)
+    results = model.val(data=data_yaml)
+    print(results)
 
     metrics_dict = None
     metrics_path = "outputs/metrics.json"
-    # Try to get a metrics dictionary if available
-    if hasattr(metrics, "keys"):
-        metrics_dict = dict(metrics)
-    elif hasattr(metrics, "results_dict"):
-        metrics_dict = metrics.results_dict
-    elif hasattr(metrics, "metrics"):
-        metrics_dict = metrics.metrics
+
+    # Defensive extraction covering YOLOv8+ formats
+    if hasattr(results, "results_dict"):
+        metrics_dict = results.results_dict
+    elif hasattr(results, "metrics"):
+        metrics_dict = results.metrics
+    elif isinstance(results, dict):
+        metrics_dict = results
+    elif isinstance(results, list):
+        # Possibly empty result or per-image stats.
+        print("Warning: results is a list, likely no metrics extracted.")
+        metrics_dict = None
 
     if metrics_dict:
         os.makedirs("outputs", exist_ok=True)
@@ -36,9 +40,9 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
             json.dump(metrics_dict, f, indent=2)
         for k, v in metrics_dict.items():
             try:
-                mlflow.log_metric(k, float(v))
+                mlflow.log_metric(str(k), float(v))
             except Exception:
-                pass
+                continue
         mlflow.log_artifact(metrics_path, artifact_path="eval")
     else:
         print("Could not extract metrics for MLflow logging.")
