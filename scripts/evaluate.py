@@ -30,7 +30,6 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
     elif isinstance(results, dict):
         metrics_dict = results
     elif isinstance(results, list):
-        # Possibly empty result or per-image stats.
         print("Warning: results is a list, likely no metrics extracted.")
         metrics_dict = None
 
@@ -38,9 +37,11 @@ with mlflow.start_run(run_name="YOLO_Evaluation"):
         os.makedirs("outputs", exist_ok=True)
         with open(metrics_path, "w") as f:
             json.dump(metrics_dict, f, indent=2)
+        # Log each metric to MLflow (flatten names, ensure float)
         for k, v in metrics_dict.items():
+            key = str(k).replace("/", "_").replace(" ", "_")
             try:
-                mlflow.log_metric(str(k), float(v))
+                mlflow.log_metric(key, float(v))
             except Exception:
                 continue
         mlflow.log_artifact(metrics_path, artifact_path="eval")

@@ -10,12 +10,8 @@ with mlflow.start_run(run_name="YOLO_Training"):
     print("Content in cwd:", os.listdir())
 
     # Data yaml
-    data_yaml = (
-        '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
-    )
-    output_dir = (
-        '/home/runner/work/MLOps/MLOps/outputs/model_weights'
-    )
+    data_yaml = '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
+    output_dir = '/home/runner/work/MLOps/MLOps/outputs/model_weights'
 
     # Log hyperparameters to MLflow
     mlflow.log_param("yolo_model", "yolov8n.pt")
@@ -49,8 +45,25 @@ with mlflow.start_run(run_name="YOLO_Training"):
         print(f"best.pt not found at: {best_pt}")
         exit(1)
 
-    # Log training metrics if available
-    if hasattr(results, "metrics"):
-        for m, val in results.metrics.items():
-            mlflow.log_metric(m, val)
+    # Log training metrics if available (as MLflow metrics)
+    metrics_dict = None
+    if hasattr(results, "results_dict"):
+        metrics_dict = results.results_dict
+    elif hasattr(results, "metrics"):
+        metrics_dict = results.metrics
+    elif isinstance(results, dict):
+        metrics_dict = results
+    elif isinstance(results, list):
+        print("Warning: results is a list, likely no metrics extracted.")
+        metrics_dict = None
+
+    if metrics_dict:
+        for k, v in metrics_dict.items():
+            # Flatten keys for MLflow (no slashes or spaces)
+            key = str(k).replace("/", "_").replace(" ", "_")
+            try:
+                mlflow.log_metric(key, float(v))
+            except Exception:
+                continue
+
     print('Training done. Best model saved and logged to MLflow.')
