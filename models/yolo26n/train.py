@@ -6,7 +6,10 @@ import re
 
 
 def clean_key(key):
-    """Clean metric key to be MLflow compatible (alphanumeric and underscores)."""
+    """
+    Clean metric key to be MLflow compatible:
+    only alphanumeric chars and underscores.
+    """
     return re.sub(r'[^A-Za-z0-9_]', '_', key)
 
 
