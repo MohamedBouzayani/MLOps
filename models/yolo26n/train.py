@@ -4,9 +4,11 @@ import shutil
 import mlflow
 import re
 
+
 def clean_key(key):
     """Clean metric key to be MLflow compatible (alphanumeric and underscores)."""
     return re.sub(r'[^A-Za-z0-9_]', '_', key)
+
 
 # Start MLflow run
 with mlflow.start_run(run_name="YOLO_Training"):
@@ -15,8 +17,12 @@ with mlflow.start_run(run_name="YOLO_Training"):
     print("Content in cwd:", os.listdir())
 
     # Data yaml
-    data_yaml = '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
-    output_dir = '/home/runner/work/MLOps/MLOps/outputs/model_weights'
+    data_yaml = (
+        '/home/runner/work/MLOps/MLOps/data/coco128.yaml'
+    )
+    output_dir = (
+        '/home/runner/work/MLOps/MLOps/outputs/model_weights'
+    )
 
     # Log hyperparameters to MLflow
     mlflow.log_param("yolo_model", "yolov8n.pt")
@@ -26,7 +32,11 @@ with mlflow.start_run(run_name="YOLO_Training"):
 
     # Train YOLO model
     model = YOLO("yolov8n.pt")
-    results = model.train(data=data_yaml, epochs=10, imgsz=640)
+    results = model.train(
+        data=data_yaml,
+        epochs=10,
+        imgsz=640
+    )
 
     # Get the YOLO output directory (YOLOv8+)
     yolo_saved_dir = results.save_dir
