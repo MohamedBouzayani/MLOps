@@ -24,8 +24,6 @@ jobs:
       - name: Run flake8 linting
         run: flake8 .
 
-  
-
   train:
     name: Train YOLO Model
     runs-on: ubuntu-latest
@@ -41,6 +39,9 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Set MLflow Tracking URI
+        run: echo "MLFLOW_TRACKING_URI=http://13.37.57.213:5000/" >> $GITHUB_ENV
 
       - name: Train YOLO Model
         run: python models/yolo26n/train.py
@@ -66,6 +67,9 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Set MLflow Tracking URI
+        run: echo "MLFLOW_TRACKING_URI=http://13.37.57.213:5000/" >> $GITHUB_ENV
 
       - name: Download trained model artifact
         uses: actions/download-artifact@v4   
