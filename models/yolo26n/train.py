@@ -66,5 +66,4 @@ with mlflow.start_run(run_name="YOLO_Training"):
             except Exception:
                 continue
 
-    print('Training done. Best model saved and logged to MLflow.')
-    
+    print('Training done. Best model saved and logged to MLflow.') 
