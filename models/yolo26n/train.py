@@ -2,6 +2,11 @@ from ultralytics import YOLO
 import os
 import shutil
 import mlflow
+import re
+
+def clean_key(key):
+    """Clean metric key to be MLflow compatible (alphanumeric and underscores)."""
+    return re.sub(r'[^A-Za-z0-9_]', '_', key)
 
 # Start MLflow run
 with mlflow.start_run(run_name="YOLO_Training"):
@@ -23,7 +28,7 @@ with mlflow.start_run(run_name="YOLO_Training"):
     model = YOLO("yolov8n.pt")
     results = model.train(data=data_yaml, epochs=10, imgsz=640)
 
-    # Get the actual YOLO output directory (works for YOLOv8+)
+    # Get the YOLO output directory (YOLOv8+)
     yolo_saved_dir = results.save_dir
     print("YOLO outputs saved to:", yolo_saved_dir)
 
@@ -39,7 +44,6 @@ with mlflow.start_run(run_name="YOLO_Training"):
     if os.path.isfile(best_pt):
         shutil.copy(best_pt, dst_path)
         print(f"Best model copied to: {dst_path}")
-        # Log model artifact in MLflow
         mlflow.log_artifact(dst_path, artifact_path="model")
     else:
         print(f"best.pt not found at: {best_pt}")
@@ -57,13 +61,14 @@ with mlflow.start_run(run_name="YOLO_Training"):
         print("Warning: results is a list, likely no metrics extracted.")
         metrics_dict = None
 
+    print("Logging the following metrics to MLflow:", metrics_dict)
     if metrics_dict:
         for k, v in metrics_dict.items():
-            # Flatten keys for MLflow (no slashes or spaces)
-            key = str(k).replace("/", "_").replace(" ", "_")
             try:
-                mlflow.log_metric(key, float(v))
-            except Exception:
-                continue
+                k_clean = clean_key(str(k))
+                val = float(v)
+                mlflow.log_metric(k_clean, val)
+            except Exception as e:
+                print(f"Could not log {k}: {e}")
 
     print('Training done. Best model saved and logged to MLflow.')
